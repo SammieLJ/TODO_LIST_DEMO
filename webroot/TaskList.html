@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+
+<head>
+  <meta charset="UTF-8">
+  <link data-require="bootstrap-css@3.1.1" data-semver="3.1.1" rel="stylesheet" href="css/bootstrap.min.css" />
+  <link href="css/bootstrap-combined.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="css/xeditable.css" rel="stylesheet">
+
+  <script data-require="angular.js@1.4.0" data-semver="1.4.0" src="js/angular.js"></script>
+  <script src="js/angular-ui-bootstrap-modal.js"></script>
+
+  <script data-require="jquery@*" data-semver="2.0.3" src="js/jquery-2.0.3.min.js"></script>
+  <script data-require="bootstrap@3.1.1" data-semver="3.1.1" src="js/bootstrap.min.js"></script>
+  
+  <script src="js/script.js"></script>
+  <script src="js/dirPagination.js"></script>
+  <script src="js/xeditable.js"></script>
+</head>
+<body class="my-controller">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8">
+        <div ng-controller="MyController" id="MyController">
+          <h1>Task Paginated Menu</h1>
+
+          <small>this is in "MyController"</small>
+
+          <div class="row">
+            <div class="col-xs-4">
+              <h3>Tasks Page: {{ currentPage }}</h3>
+            </div>
+            <div class="col-xs-4">
+              <label for="search">Search:</label>
+              <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+            </div>
+            <div class="col-xs-4">
+              <label for="search">items per page:</label>
+              <input type="number" min="1" max="100" class="form-control" ng-model="pageSize">
+            </div>
+          </div>
+          <br>
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <table class="table table-striped">
+                <tr>
+                  <td style="width: 1px;"><b>Id</b></td>
+                  <td><b>Task Owner</b></td>
+                  <td><b>Status</b></td>
+                  <td><b>Entry Date</b></td>
+                  <td><b>Options</b></td>
+                  <td></td>
+                </tr>
+                <tr dir-paginate="task in tasks | filter:q | itemsPerPage: pageSize" current-page="currentPage">
+                  <td>{{task.Id}}</td>
+                  <td>{{task.TaskOwner || 'no owner' }}</td>
+                  <td><span ng-if="task.Completed" class="label label-success">Done</span><span ng-if="!task.Completed" class="label label-important">In Progress</span></td>
+                  <td>{{task.EntryTime | date : "medium" }}</td>
+                  <td>  <a class="btn" data-toggle="modal" data-ng-click="editRow(task)">Edit</a></td>
+                  <td>  <a class="btn" data-toggle="modal" data-ng-click="removeRow(task)">Delete</a></td>
+                </tr>
+              </table>
+              
+          </div>
+        </div>
+
+        
+        <div ng-controller="OtherController" class="other-controller">
+          <small>this is in "OtherController"</small>
+          <div class="text-center">
+          <dir-pagination-controls boundary-links="true" on-page-change="pageChangeHandler(newPageNumber)" template-url="dirPagination.tpl.html"></dir-pagination-controls>
+          </div>
+        </div>
+
+        <!-- Beginning Modal Form -->
+      <div ng-controller="MyCtrl">
+          <a class="btn btn-primary" ng-click="open()">Add task</a>
+          <a class="btn" ng-click="updateTasks()">Update Tasks</a>
+
+        <!-- Beginning Add New Task -->
+          <div modal="showModal" close="cancel()" class="modal-dialog" style="height:300px">
+            <div class="modal-header">
+                <h4>Add task modal form</h4>
+            </div>
+            <div class="modal-body">
+
+              <div class="input text">
+                <label for="taskowner">Lastnik / Task owner</label>
+                <input type="text" name="TaskOwner" ng-model="NewTaskOwner" maxlength="255" id="taskowner" />
+              </div>
+
+              <div class="input text">
+                <label for="taskdesc">Opisi Opravilo / Enter Task</label>
+                <textarea type="text" name="TaskDesc" ng-model="NewTaskDesc" maxlength="255" id="taskdesc" style="height: 55px;width: 450px"></textarea>
+              </div>
+
+              <div class="input checkbox">
+                <input type="hidden" ng-model="NewTaskCompleted" name="Completed" value="0"/>
+                <label for="completed"><input type="checkbox" ng-model="NewTaskCompleted" name="Completed" value="1" id="completed">Dokočano? / Is Complete?</label>
+              </div>
+
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-success" ng-click="ok()">Okay</button>
+              <button class="btn" ng-click="cancel()">Cancel</button>
+            </div>
+          </div>
+        <!-- END: Add New Task -->
+
+      </div>
+      <!-- END: MyCtrl -->
+
+      <!-- Beginning EditCtrl - Modal Form -->
+      <div ng-controller="EditCtrl">
+        <!-- Beginning Edit Task -->
+          <div modal="showEditModal" close="cancelEdit()" class="modal-dialog" style="height:420px">
+            <div class="modal-header">
+                <h4>Edit task modal form</h4>
+            </div>
+            <div class="modal-body">
+              <div class="input text">
+                <label for="editTaskOwner">Lastnik / Task owner - <strong>{{selectedTask.TaskOwner || 'no owner' }}</strong></label>
+                <input type="text" name="editTaskOwner" ng-model="selectedTask.TaskOwner" maxlength="255" id="editTaskOwner" />
+              </div>
+
+              <div class="input text">
+                <label for="editTaskDesc">Edit Task <strong>{{selectedTask.Id}}</strong></label>
+                <strong>{{ selectedTask.TaskDesc || 'no description' }}</strong><textarea type="text" id="editTaskDesc" ng-model="selectedTask.TaskDesc" maxlength="255" style="height: 55px;width: 450px"></textarea>
+              </div>
+
+              <div class="input checkbox">
+                Present status: <span ng-if="selectedTask.Completed" class="label label-success">Done</span><span ng-if="!selectedTask.Completed" class="label label-important">In Progress</span>
+              </div>
+              <div class="input checkbox">
+                <input type="hidden" ng-model="editTaskCompleted" name="Completed" value="0"/>
+                <label for="Completed"><input type="checkbox" ng-model="editTaskCompleted" name="Completed" value="1" id="Completed" />Dokočano? / Is Complete?</label>
+              </div>
+
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-success" ng-click="okEdit()">Okay</button>
+              <button class="btn" ng-click="cancelEdit()">Cancel</button>
+            </div>
+          </div>
+        <!-- END: Edit Task -->
+      </div>
+      <!-- END: EditCtrl -->
+
+      </div><!-- END: MyController -->
+            
+    </div>
+  </div>
+</body>
+
+</html>
