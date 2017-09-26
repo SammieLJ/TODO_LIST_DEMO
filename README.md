@@ -31,7 +31,10 @@ DROP TABLE `pg_todo_list_app`.`tasks`;
 
 # How to access application
 
+CakePHP default constructed application Todo List
 http://"your webserver address":"webserver port"/TODO_LIST_TEST/Tasks
+
+Angular constructed application Todo List
 http://"your webserver address":"webserver port"/TODO_LIST_TEST/TaskList.html
 
 If you didn't specifly other wise, default webserver port is 80 and you don't have to add line ":80" in URL
