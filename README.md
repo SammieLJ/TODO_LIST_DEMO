@@ -2,7 +2,7 @@
 Simple TODO list web app, using PHP5, CakePHP frmwr with WS and AngularJS ver.1
 
 # HOW-TO Set up application
-PHP Composer is installed that can be accessed globaly (from command line):
+PHP Composer must be installed so that can be accessed globaly (when using command line):
 1. composer self-update && composer create-project --prefer-dist cakephp/app Ime_Spletne_app
 2. www\TODO_LIST_TEST\config\app.default.php in app.php
 3. bin\cake tasks all
